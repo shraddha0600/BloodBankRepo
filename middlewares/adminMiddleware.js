@@ -1,14 +1,6 @@
 // Import user model to check for admin privileges
 const userModel = require("../models/userModel");
 
-/**
- * Middleware to check if the authenticated user is an admin.
- * This middleware assumes that the user is already authenticated and their ID is available in `req.user`.
- * 
- * @param {Object} req - The request object containing HTTP request data.
- * @param {Object} res - The response object used to send back data to the client.
- * @param {Function} next - The next middleware function to be called.
- */
 const adminMiddleware = async (req, res, next) => {
   try {
     // Retrieve the user details using the user ID from the request (added by authMiddleware)
