@@ -1,14 +1,7 @@
 // Import necessary libraries
 const jwt = require("jsonwebtoken");
 
-/**
- * Middleware to verify and authenticate a user using JWT tokens.
- * Checks if the token is valid and decodes the user information from the token.
- * 
- * @param {Object} req - The request object containing HTTP request data.
- * @param {Object} res - The response object used to send back data to the client.
- * @param {Function} next - The next middleware function to be called.
- */
+
 const authMiddleware = async (req, res, next) => {
   try {
     // Get the token from the request headers (Authorization field)
