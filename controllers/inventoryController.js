@@ -2,14 +2,7 @@
 const inventoryModel = require("../models/inventoryModel");
 const mongoose = require("mongoose");
 
-// ===================== ADD BLOOD INVENTORY ==========================
-/**
- * Controller to add blood inventory (either 'in' or 'out').
- * Stores inventory data like blood group, quantity, and inventory type.
- * 
- * @param {Object} req - The request object containing HTTP request data.
- * @param {Object} res - The response object used to send back data to the client.
- */
+
 const addInventoryController = async (req, res) => {
   try {
     // Destructure data from the request body
