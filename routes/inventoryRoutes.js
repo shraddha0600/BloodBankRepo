@@ -1,3 +1,4 @@
+// Import necessary modules
 const express = require("express");
 const authMiddelware = require("../middlewares/authMiddelware");
 const {
@@ -11,42 +12,42 @@ const {
   getRecentInventoryController,
 } = require("../controllers/inventoryController");
 
+// Create a router object to handle inventory-related routes
 const router = express.Router();
 
-//routes
-// ADD INVENTORY || POST
+// Route to create new inventory (add blood records)
+// POST request with authentication required
 router.post("/create-inventory", authMiddelware, createInventoryController);
 
-//GET ALL BLOOD RECORDS
+// Route to get all blood inventory records
+// GET request with authentication required
 router.get("/get-inventory", authMiddelware, getInventoryController);
-//GET RECENT BLOOD RECORDS
-router.get(
-  "/get-recent-inventory",
-  authMiddelware,
-  getRecentInventoryController
-);
 
-//GET HOSPITAL BLOOD RECORDS
+// Route to get the most recent blood inventory records
+router.get("/get-recent-inventory", authMiddelware, getRecentInventoryController);
+
+// Route to get inventory records specific to hospitals
 router.post(
   "/get-inventory-hospital",
   authMiddelware,
   getInventoryHospitalController
 );
 
-//GET DONAR RECORDS
+// Route to get donor records
 router.get("/get-donars", authMiddelware, getDonarsController);
 
-//GET HOSPITAL RECORDS
+// Route to get hospital records
 router.get("/get-hospitals", authMiddelware, getHospitalController);
 
-//GET orgnaisation RECORDS
+// Route to get organisation records
 router.get("/get-orgnaisation", authMiddelware, getOrgnaisationController);
 
-//GET orgnaisation RECORDS
+// Route to get organisation records for hospitals
 router.get(
   "/get-orgnaisation-for-hospital",
   authMiddelware,
   getOrgnaisationForHospitalController
 );
 
+// Export the router for use in the app
 module.exports = router;

@@ -1,0 +1,14 @@
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../middlewares/authMiddleware');
+const { adminMiddleware } = require('../middlewares/adminMiddleware');
+
+// Example of a protected route accessible only by authenticated users
+router.get('/protected', authMiddleware, (req, res) => {
+  res.send('This is a protected route for authenticated users');
+});
+
+// Example of an admin-only route
+router.get('/admin/protected', authMiddleware, adminMiddleware, (req, res) => {
+  res.send('This is a protected route for admins only');
+});

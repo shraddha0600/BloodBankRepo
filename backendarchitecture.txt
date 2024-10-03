@@ -1,0 +1,64 @@
+This backend is a Node.js/Express.js application designed to manage a blood inventory system with authentication, admin functionalities, and analytics. Here's a detailed breakdown of each component:
+
+1. server.js File
+This is the entry point of your application. It:
+
+Sets up a basic Express.js server.
+Connects to the MongoDB database using connectDB().
+Loads environment variables from the .env file, including sensitive configurations like PORT or database URLs.
+Implements middlewares like express.json() for parsing JSON, cors() for enabling Cross-Origin Resource Sharing, and morgan("dev") for logging HTTP requests.
+Mounts different route modules to handle different parts of the application, including authentication, inventory management, and admin operations.
+Starts the server on a specified port (e.g., 8080) and logs a message indicating the server is running.
+2. Database Connection (config/db.js)
+The connectDB() function in config/db.js handles the connection to the MongoDB database using Mongoose. It ensures that the application is connected to the database for storing and retrieving data such as users, inventory, etc.
+
+3. Route Files
+Routes in Express.js define the endpoints for different functionalities:
+
+testRoutes.js: Contains a basic test route to ensure the server is up and running.
+authRoutes.js: Manages user registration, login, and fetching the current logged-in user. It interacts with the authentication logic in the authController.js.
+inventoryRoutes.js: Handles CRUD operations related to the blood inventory system, allowing users to create, fetch, and manage blood records.
+analyticsRoutes.js: Provides analytics on blood group data, used for reporting purposes.
+adminRoutes.js: Allows admin users to manage donors, hospitals, and organisations. It also enables admins to delete specific records.
+4. Middleware
+Middleware in this project is used to handle certain processes before requests are passed on to the controllers:
+
+authMiddleware.js: This ensures that the user is authenticated (logged in) before they can access certain routes.
+adminMiddleware.js: This middleware ensures that only admin users can access certain sensitive routes like deleting a donor or managing organisations.
+5. Controllers
+Controllers contain the logic that runs when specific routes are accessed:
+
+authController.js: Handles authentication tasks like user registration, login, and retrieving current user details.
+inventoryController.js: Manages the blood inventory operations, including creating and fetching inventory records.
+adminController.js: Contains the logic for admin operations such as fetching lists of donors, hospitals, and organisations, as well as deleting donor records.
+analyticsController.js: Provides data and statistics on blood groups, enabling a more analytic view of the blood supply.
+6. Models
+Models define the data structure and schema for different collections in MongoDB:
+
+userModel.js: Defines the schema for users, including attributes like role, name, email, password, and phone.
+inventoryModel.js: Defines the schema for blood inventory records, including inventory type (in/out), blood group, quantity, and associated organisation or donor.
+7. Environment Variables
+The .env file stores configuration values that are environment-specific, such as:
+
+PORT: Defines the port on which the server runs.
+MONGO_URI: The connection string for the MongoDB database.
+DEV_MODE: Indicates the environment (development, production) in which the application is running.
+8. Key Dependencies
+Express.js: A web framework for handling HTTP requests and building APIs.
+Mongoose: An ODM (Object Data Modeling) library to interact with MongoDB, simplifying data querying and validation.
+dotenv: A library for loading environment variables from a .env file.
+morgan: A middleware for logging HTTP requests in a standardized format.
+cors: Enables your server to accept requests from different origins, especially useful for frontend-backend communication.
+colors: Used to colorize console output for better visibility.
+9. Authentication Flow
+authRoutes.js allows users to register (/register) and log in (/login). Once logged in, the authMiddleware ensures that only authenticated users can access certain routes.
+The login system typically uses a token-based system (likely JWT, though not mentioned here), where the user receives a token upon login, and this token is used for subsequent API requests to verify their identity.
+How Requests Flow Through the Backend
+Client sends an HTTP request (e.g., creating a new blood inventory record).
+Express routes the request to the appropriate route handler based on the URL and HTTP method (e.g., POST /api/v1/inventory/create-inventory).
+Middleware executes:
+If authentication is required, authMiddleware checks if the user is logged in.
+If admin privileges are required, adminMiddleware verifies the user’s role.
+Controller function runs: The corresponding controller processes the request, interacts with the database if needed, and sends a response back to the client.
+Response sent back to the client.
+This backend structure is highly modular, cleanly separating concerns (routes, controllers, middlewares, models), making it scalable and easier to maintain.

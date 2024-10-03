@@ -1,103 +1,109 @@
+// Import user model and necessary libraries
 const userModel = require("../models/userModel");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs"); // for password hashing
+const jwt = require("jsonwebtoken"); // for token generation
 
+// ===================== REGISTER USER ==========================
+/**
+ * Controller to handle user registration.
+ * Hashes the password and stores the user in the database.
+ * 
+ * @param {Object} req - The request object containing HTTP request data (user details).
+ * @param {Object} res - The response object used to send back data to the client.
+ */
 const registerController = async (req, res) => {
   try {
-    const exisitingUser = await userModel.findOne({ email: req.body.email });
-    //validation
-    if (exisitingUser) {
-      return res.status(200).send({
+    // Destructure the necessary fields from the request body
+    const { name, email, password, role } = req.body;
+
+    // Check if the user already exists by email
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send({
         success: false,
-        message: "User ALready exists",
+        message: "User Already Exists",
       });
     }
-    //hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-    req.body.password = hashedPassword;
-    //rest data
-    const user = new userModel(req.body);
-    await user.save();
+
+    // Hash the password before storing it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user with hashed password and save to database
+    const newUser = new userModel({
+      name,
+      email,
+      password: hashedPassword,
+      role, // 'donor', 'hospital', or 'organisation'
+    });
+    await newUser.save();
+
+    // Send success response
     return res.status(201).send({
       success: true,
-      message: "User Registerd Successfully",
-      user,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Error In Register API",
-      error,
-    });
-  }
-};
-
-//login call back
-const loginController = async (req, res) => {
-  try {
-    const user = await userModel.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(404).send({
-        success: false,
-        message: "Invalid Credentials",
-      });
-    }
-    //check role
-    if (user.role !== req.body.role) {
-      return res.status(500).send({
-        success: false,
-        message: "role dosent match",
-      });
-    }
-    //compare password
-    const comparePassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-    if (!comparePassword) {
-      return res.status(500).send({
-        success: false,
-        message: "Invalid Credentials",
-      });
-    }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    return res.status(200).send({
-      success: true,
-      message: "Login Successfully",
-      token,
-      user,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Error In Login API",
-      error,
-    });
-  }
-};
-
-//GET CURRENT USER
-const currentUserController = async (req, res) => {
-  try {
-    const user = await userModel.findOne({ _id: req.body.userId });
-    return res.status(200).send({
-      success: true,
-      message: "User Fetched Successfully",
-      user,
+      message: "User Registered Successfully",
+      newUser,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
       success: false,
-      message: "unable to get current user",
+      message: "Error in Register API",
       error,
     });
   }
 };
 
-module.exports = { registerController, loginController, currentUserController };
+// ===================== LOGIN USER ==========================
+/**
+ * Controller to handle user login.
+ * Verifies the password and generates a JWT token.
+ * 
+ * @param {Object} req - The request object containing HTTP request data (email and password).
+ * @param {Object} res - The response object used to send back data to the client.
+ */
+const loginController = async (req, res) => {
+  try {
+    // Destructure email and password from request body
+    const { email, password } = req.body;
+
+    // Check if the user exists by email
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    // Compare the provided password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid Credentials",
+      });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d", // Token valid for 1 day
+    });
+
+    // Send success response with token
+    return res.status(200).send({
+      success: true,
+      message: "Login Successful",
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error in Login API",
+      error,
+    });
+  }
+};
+
+// Export the controller functions
+module.exports = { registerController, loginController };

@@ -1,37 +1,38 @@
+// Import necessary modules
 const express = require("express");
 const authMiddelware = require("../middlewares/authMiddelware");
+const adminMiddleware = require("../middlewares/adminMiddleware");
 const {
   getDonarsListController,
   getHospitalListController,
   getOrgListController,
   deleteDonarController,
 } = require("../controllers/adminController");
-const adminMiddleware = require("../middlewares/adminMiddleware");
 
-//router object
+// Create a router object to handle admin-related routes
 const router = express.Router();
 
-//Routes
-
-//GET || DONAR LIST
+// Route to get the list of donors
+// Only accessible to authenticated admins
 router.get(
   "/donar-list",
-  authMiddelware,
-  adminMiddleware,
-  getDonarsListController
+  authMiddelware,       // Ensures the user is authenticated
+  adminMiddleware,      // Ensures the user is an admin
+  getDonarsListController // Controller handling the request logic
 );
-//GET || HOSPITAL LIST
+
+// Route to get the list of hospitals
 router.get(
   "/hospital-list",
   authMiddelware,
   adminMiddleware,
   getHospitalListController
 );
-//GET || ORG LIST
-router.get("/org-list", authMiddelware, adminMiddleware, getOrgListController);
-// ==========================
 
-// DELETE DONAR || GET
+// Route to get the list of organisations
+router.get("/org-list", authMiddelware, adminMiddleware, getOrgListController);
+
+// Route to delete a donor by ID (admin-only access)
 router.delete(
   "/delete-donar/:id",
   authMiddelware,
@@ -39,5 +40,5 @@ router.delete(
   deleteDonarController
 );
 
-//EXPORT
+// Export the router to be used in other parts of the app
 module.exports = router;
